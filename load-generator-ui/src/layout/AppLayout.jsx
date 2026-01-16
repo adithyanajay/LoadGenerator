@@ -1,4 +1,5 @@
 import ThemeToggle from "../components/ThemeToggle";
+import Logo from "../components/ui/Logo";
 
 export default function AppLayout({ children }) {
   return (
@@ -6,18 +7,18 @@ export default function AppLayout({ children }) {
 
       {/* SIDEBAR */}
       <aside className="w-64 bg-white dark:bg-darkCard border-r border-gray-200 dark:border-gray-700 flex flex-col">
-        <div className="px-6 py-5 text-xl font-bold text-primary">
-          DynamiQ
+        <div className="px-6 py-5">
+          <Logo />
         </div>
 
         <nav className="flex-1 px-4 space-y-2">
-          <div className="text-sm font-medium text-gray-500 uppercase">
+          <div className="text-sm font-medium text-textSecondary uppercase">
             Load Tools
           </div>
-          <button className="w-full text-left px-3 py-2 rounded-md bg-primary text-white">
+          <button className="w-full text-left px-3 py-2 rounded-md bg-accent text-white font-medium">
             Load Generator
           </button>
-          <button className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+          <button className="w-full text-left px-3 py-2 rounded-md font-medium text-textSecondary hover:bg-gray-100 dark:hover:bg-gray-700">
             Load Balancer
           </button>
         </nav>

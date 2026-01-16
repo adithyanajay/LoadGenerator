@@ -1,24 +1,22 @@
 import { Network } from "lucide-react";
+import Input from "../ui/Input";
 
 export default function NetworkControls({ setParams }) {
   return (
     <div>
-      <div className="flex items-center gap-2 mb-2 text-primary">
-        <Network size={18} />
-        <span className="font-medium">Network Load</span>
+      <div className="flex items-center gap-2 mb-3 text-textPrimary">
+        <Network size={18} className="text-accent" />
+        <span className="font-semibold text-sm uppercase tracking-wide">Network Load Configuration</span>
       </div>
 
-      <input
+      <Input
         type="number"
-        min="1"
-        placeholder="Concurrent connections (--sock N)"
+        label="Concurrent Connections"
+        placeholder="e.g. 100"
         onChange={(e) =>
           setParams((p) => ({ ...p, connections: e.target.value }))
         }
-        className="w-full px-3 py-2 rounded-md border
-          bg-white dark:bg-darkCard
-          text-gray-900 dark:text-white
-          border-gray-300 dark:border-gray-600"
+        className="w-full"
       />
     </div>
   );

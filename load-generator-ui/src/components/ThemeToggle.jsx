@@ -14,8 +14,9 @@ export default function ThemeToggle() {
       }
       className="
         px-4 py-1.5 rounded-full text-sm
-        bg-primary text-white
+        bg-accent text-white font-medium
         hover:bg-primaryDark
+        shadow-sm hover:shadow-md transition-all
       "
     >
       {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}

@@ -1,16 +1,13 @@
-export default function DurationInput() {
+import Input from "./ui/Input";
+
+export default function DurationInput({ onChange }) {
   return (
-    <div>
-      <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">
-        Duration (seconds)
-      </label>
-      <input
-        type="number"
-        className="w-full px-3 py-2 rounded-md
-          bg-white dark:bg-darkCard
-          border border-gray-300 dark:border-gray-600
-          text-gray-900 dark:text-white"
-      />
-    </div>
+    <Input
+      type="number"
+      label="Duration (seconds)"
+      placeholder="e.g. 60"
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full"
+    />
   );
 }

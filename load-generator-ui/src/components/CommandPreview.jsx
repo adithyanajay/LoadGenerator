@@ -10,10 +10,10 @@ export default function CommandPreview({ command }) {
   return (
     <pre
       className="
-        bg-gray-100 dark:bg-[#111827]
-        border border-gray-300 dark:border-gray-700
+        bg-white/50 backdrop-blur-sm
+        border border-gray-200
         rounded-md p-3 text-sm
-        text-purple-700 dark:text-purple-400
+        text-accent font-mono
         overflow-x-auto
       "
     >
