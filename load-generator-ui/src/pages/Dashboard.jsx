@@ -4,32 +4,60 @@ import LoadTypeSelector from "../components/LoadTypeSelector";
 import CpuControls from "../components/controls/CpuControls";
 import MemoryControls from "../components/controls/MemoryControls";
 import NetworkControls from "../components/controls/NetworkControls";
-import DurationInput from "../components/DurationInput";
 import StatusPanel from "../components/StatusPanel";
-import LoadChart from "../components/LoadChart";
-import MemoryChart from "../components/MemoryChart";
-import NetworkChart from "../components/NetworkChart";
-import CommandPreview from "../components/CommandPreview";
-import { buildStressCommand } from "../utils/stressCommandBuilder";
 import GlassCard from "../components/ui/GlassCard";
 import Button from "../components/ui/Button";
+
+const BACKEND_URL = "http://localhost:9000/api/v1/load";
+// 🔴 change to VM IP when deployed
 
 export default function Dashboard() {
   const [loadType, setLoadType] = useState("cpu");
   const [status, setStatus] = useState("IDLE");
   const [params, setParams] = useState({});
-  const [duration, setDuration] = useState("");
 
-  const command = buildStressCommand(loadType, params, duration);
-  const isRunning = status === "RUNNING";
+  async function startLoad() {
+    const payload = {
+      cpu_workers: 0,
+      memory_mb: 0,
+      network_mbps: 0,
+    };
+
+    if (loadType === "cpu") {
+      payload.cpu_workers = Number(params.cpuThreads || 0);
+    }
+
+    if (loadType === "memory") {
+      payload.memory_mb = Number(params.memoryMB || 0);
+    }
+
+    // Visual feedback only (non-blocking)
+    setStatus("RUNNING");
+
+    // Fire-and-forget request
+    fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }).catch((err) => {
+      console.error(err);
+      setStatus("ERROR");
+    });
+
+    // Reset status quickly (do NOT wait for backend)
+    setTimeout(() => {
+      setStatus("IDLE");
+    }, 800);
+  }
 
   return (
     <div className="max-w-4xl mx-auto pb-10 space-y-8">
 
-      {/* Top Section: Config & Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left Column: Configuration */}
+        {/* Configuration */}
         <div className="lg:col-span-2 space-y-6">
           <GlassCard title="Target Configuration">
             <TargetConfig />
@@ -48,7 +76,7 @@ export default function Dashboard() {
           </GlassCard>
         </div>
 
-        {/* Right Column: Execution & Status */}
+        {/* Status & Control */}
         <div className="space-y-6">
           <GlassCard title="System Status">
             <div className="flex flex-col items-center justify-center py-4">
@@ -57,45 +85,17 @@ export default function Dashboard() {
           </GlassCard>
 
           <GlassCard title="Execution Control">
-            <div className="space-y-6">
-              <DurationInput onChange={setDuration} />
-
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant="primary"
-                  onClick={() => setStatus("RUNNING")}
-                  disabled={isRunning}
-                  className="w-full flex items-center justify-center gap-2"
-                >
-                  {isRunning ? "Running..." : "Start Load"}
-                </Button>
-
-                <Button
-                  variant="danger"
-                  onClick={() => setStatus("STOPPED")}
-                  disabled={!isRunning}
-                  className="w-full"
-                >
-                  Stop
-                </Button>
-              </div>
-            </div>
+            <Button
+              variant="primary"
+              onClick={startLoad}
+              className="w-full"
+            >
+              Start Load
+            </Button>
           </GlassCard>
         </div>
       </div>
-
-      {/* Bottom Section: Charts & Preview */}
-      <GlassCard title="Live Metrics">
-        {loadType === "cpu" && <LoadChart status={status} />}
-        {loadType === "memory" && <MemoryChart status={status} />}
-        {loadType === "network" && <NetworkChart status={status} />}
-      </GlassCard>
-
-      <GlassCard title="Command Preview">
-        <div className="bg-gray-900 rounded-lg p-4 font-mono text-xs text-green-400 overflow-x-auto shadow-inner">
-          <CommandPreview command={command} />
-        </div>
-      </GlassCard>
     </div>
   );
 }
+
