@@ -1,6 +1,6 @@
 # Load Generator UI – DynamiQ Project
 
-A **React + Tailwind CSS** based frontend client used to configure and initiate stress tests for the **DynamiQ: Threshold-Based Load Balancer** system.
+A **React + Tailwind CSS + Go** based frontend + backend software used to configure and initiate stress tests for the **DynamiQ: Threshold-Based Load Balancer** system.
 
 This Load Generator acts as a **client-side controller** that sends load configuration parameters (CPU, Memory, Request patterns) to the Load Balancer, which then distributes the load across virtual machines (VMs) using a dual-threshold auto-scaling strategy.
 
@@ -8,7 +8,7 @@ This Load Generator acts as a **client-side controller** that sends load configu
 
 ##  Project Context
 
-This module is part of the **DynamiQ: Threshold-Based Load Balancer** major project developed as part of the B.Tech Computer Science & Engineering curriculum.
+The Load Generator module is part of the **DynamiQ: Threshold-Based Load Balancer** major project.
 
 **Role of this module:**
 - Provides a user interface to configure stress tests
@@ -40,6 +40,7 @@ This module is part of the **DynamiQ: Threshold-Based Load Balancer** major proj
 |---------|--------|
 | React (Vite) | Frontend framework |
 | Tailwind CSS | Styling |
+| Go | Backend |
 | Recharts | CPU & Memory trend visualization |
 | Node.js | Development environment |
 | npm | Package management |
