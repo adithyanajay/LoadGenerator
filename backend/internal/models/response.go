@@ -5,6 +5,6 @@ type LoadResponse struct {
 	SessionID      string `json:"session_id"`
 	Type           string `json:"type"`
 	TimeoutSeconds int    `json:"timeout_seconds"`
-	VMIP           string `json:"vm_ip"`
+	VMIP           string `json:"vm_ip"` // ✅ PUBLIC IP
 	Message        string `json:"message"`
 }

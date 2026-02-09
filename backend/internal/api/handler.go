@@ -9,20 +9,16 @@ import (
 	"load-generator/internal/utils"
 )
 
+
 func HandleLoad(c *gin.Context) {
 	var req models.LoadRequest
-
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid request",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	var (
-		sessionID string
-		loadType  string
-	)
+	var sessionID string
+	var loadType string
 
 	if req.CPUWorkers > 0 {
 		sessionID = stress.StartCPUStress(req.CPUWorkers)
@@ -34,24 +30,24 @@ func HandleLoad(c *gin.Context) {
 		loadType = "memory"
 	}
 
-	vmIP, err := utils.GetVMIP()
+	publicIP, err := utils.GetPublicIP()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to determine VM IP",
+			"error": "failed to determine public VM IP",
 		})
 		return
 	}
 
-	// 🚨 IMPORTANT: respond immediately, do not block
 	c.JSON(http.StatusOK, models.LoadResponse{
 		Status:         "started",
 		SessionID:      sessionID,
 		Type:           loadType,
 		TimeoutSeconds: 300,
-		VMIP:           vmIP,
+		VMIP:           publicIP, // 🔥 THIS FIXES EVERYTHING
 		Message:        "Load started",
 	})
 }
+
 
 func HandleStop(c *gin.Context) {
 	id := c.Param("id")
