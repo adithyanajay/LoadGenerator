@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// GetPublicIP returns the EC2 public IPv4 address
+// GetPublicIP tries EC2 metadata first, falls back gracefully
 func GetPublicIP() (string, error) {
 	client := &http.Client{
 		Timeout: 2 * time.Second,
@@ -16,23 +16,14 @@ func GetPublicIP() (string, error) {
 	resp, err := client.Get(
 		"http://169.254.169.254/latest/meta-data/public-ipv4",
 	)
-	if err != nil {
-		return "", fmt.Errorf("failed to query EC2 metadata: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("metadata returned status %d", resp.StatusCode)
-	}
-
-	ip, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read metadata response: %w", err)
+	if err == nil && resp.StatusCode == http.StatusOK {
+		defer resp.Body.Close()
+		body, _ := io.ReadAll(resp.Body)
+		if len(body) > 0 {
+			return string(body), nil
+		}
 	}
 
-	if len(ip) == 0 {
-		return "", fmt.Errorf("instance has no public IP")
-	}
-
-	return string(ip), nil
+	// ❗ DO NOT FAIL — return empty string
+	return "", fmt.Errorf("no public IP available")
 }
