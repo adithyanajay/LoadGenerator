@@ -1,101 +1,122 @@
-import { useState } from "react";
-import TargetConfig from "../components/TargetConfig";
-import LoadTypeSelector from "../components/LoadTypeSelector";
-import CpuControls from "../components/controls/CpuControls";
-import MemoryControls from "../components/controls/MemoryControls";
-import NetworkControls from "../components/controls/NetworkControls";
-import StatusPanel from "../components/StatusPanel";
-import GlassCard from "../components/ui/GlassCard";
-import Button from "../components/ui/Button";
+// src/pages/Dashboard.jsx
 
-const BACKEND_URL = "http://localhost:9000/api/v1/load";
-// 🔴 change to VM IP when deployed
+import { useState } from "react"
+import TargetConfig from "../components/TargetConfig"
+import LoadTypeSelector from "../components/LoadTypeSelector"
+import CpuControls from "../components/controls/CpuControls"
+import MemoryControls from "../components/controls/MemoryControls"
+import NetworkControls from "../components/controls/NetworkControls"
+import StatusPanel from "../components/StatusPanel"
+import GlassCard from "../components/ui/GlassCard"
+import Button from "../components/ui/Button"
+import SessionPanel from "../components/SessionPanel"
+import { startLoad } from "../services/api"
 
 export default function Dashboard() {
-  const [loadType, setLoadType] = useState("cpu");
-  const [status, setStatus] = useState("IDLE");
-  const [params, setParams] = useState({});
+  const [loadType, setLoadType] = useState("cpu")
+  const [status, setStatus] = useState("IDLE")
+  const [params, setParams] = useState({})
+  const [sessions, setSessions] = useState([])
 
-  async function startLoad() {
+  async function startLoadHandler() {
     const payload = {
       cpu_workers: 0,
       memory_mb: 0,
       network_mbps: 0,
-    };
+    }
 
     if (loadType === "cpu") {
-      payload.cpu_workers = Number(params.cpuThreads || 0);
+      payload.cpu_workers = Number(params.cpuThreads || 0)
     }
 
     if (loadType === "memory") {
-      payload.memory_mb = Number(params.memoryMB || 0);
+      payload.memory_mb = Number(params.memoryMB || 0)
     }
 
-    // Visual feedback only (non-blocking)
-    setStatus("RUNNING");
+    setStatus("RUNNING")
 
-    // Fire-and-forget request
-    fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    }).catch((err) => {
-      console.error(err);
-      setStatus("ERROR");
-    });
+    try {
+      const res = await startLoad(payload)
 
-    // Reset status quickly (do NOT wait for backend)
+      const session = {
+        sessionId: res.session_id,
+        vmIP: res.vm_ip,
+        timeout: res.timeout_seconds,
+        type: res.type,
+        startedAt: Date.now(),
+      }
+
+      setSessions((prev) => [...prev, session])
+
+      // Auto-remove on timeout
+      setTimeout(() => {
+        setSessions((prev) =>
+          prev.filter((s) => s.sessionId !== session.sessionId)
+        )
+      }, res.timeout_seconds * 1000)
+
+    } catch (err) {
+      console.error(err)
+      setStatus("ERROR")
+    }
+
     setTimeout(() => {
-      setStatus("IDLE");
-    }, 800);
+      setStatus("IDLE")
+    }, 800)
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-10 space-y-8">
+    <div className="max-w-5xl mx-auto pb-10 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Configuration */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* LEFT SIDE */}
+        <div className="lg:col-span-3 space-y-6">
           <GlassCard title="Target Configuration">
             <TargetConfig />
           </GlassCard>
 
           <GlassCard title="Load Settings">
-            <div className="space-y-6">
-              <LoadTypeSelector loadType={loadType} setLoadType={setLoadType} />
+            <LoadTypeSelector
+              loadType={loadType}
+              setLoadType={setLoadType}
+            />
 
-              <div className="p-4 rounded-xl bg-secondary dark:bg-white/5 border border-white/10">
-                {loadType === "cpu" && <CpuControls setParams={setParams} />}
-                {loadType === "memory" && <MemoryControls setParams={setParams} />}
-                {loadType === "network" && <NetworkControls setParams={setParams} />}
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* Status & Control */}
-        <div className="space-y-6">
-          <GlassCard title="System Status">
-            <div className="flex flex-col items-center justify-center py-4">
-              <StatusPanel status={status} />
+            <div className="mt-4 p-4 rounded-xl bg-secondary border">
+              {loadType === "cpu" && (
+                <CpuControls setParams={setParams} />
+              )}
+              {loadType === "memory" && (
+                <MemoryControls setParams={setParams} />
+              )}
+              {loadType === "network" && (
+                <NetworkControls setParams={setParams} />
+              )}
             </div>
           </GlassCard>
 
           <GlassCard title="Execution Control">
+            <div className="flex justify-center py-4">
+              <StatusPanel status={status} />
+            </div>
+
             <Button
               variant="primary"
-              onClick={startLoad}
               className="w-full"
+              onClick={startLoadHandler}
             >
               Start Load
             </Button>
           </GlassCard>
         </div>
+
+        {/* RIGHT SIDE */}
+        <div>
+          <SessionPanel
+            sessions={sessions}
+            setSessions={setSessions}
+          />
+        </div>
       </div>
     </div>
-  );
+  )
 }
-

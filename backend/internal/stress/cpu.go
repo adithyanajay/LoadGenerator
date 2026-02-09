@@ -1,19 +1,24 @@
 package stress
 
 import (
-	"log"
+	"os/exec"
 	"strconv"
 
+	"github.com/google/uuid"
 	"load-generator/internal/utils"
 )
 
-func StartCPUStress(workers int) {
-	args := []string{
+func StartCPUStress(workers int) string {
+	id := uuid.New().String()
+
+	cmd := exec.Command(
+		"stress-ng",
 		"--cpu", strconv.Itoa(workers),
 		"--timeout", stressTimeout,
-	}
+	)
 
-	log.Printf("Starting CPU stress: %d workers\n", workers)
-	utils.RunStressNG(args)
+	RegisterSession(id, cmd)
+	utils.StartProcess(cmd)
+
+	return id
 }
-

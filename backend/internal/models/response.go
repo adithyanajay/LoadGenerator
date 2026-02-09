@@ -1,10 +1,10 @@
 package models
 
 type LoadResponse struct {
-	Status           string `json:"status"`
-	CPUWorkersAdded  int    `json:"cpu_workers_added"`
-	MemoryMBAdded    int    `json:"memory_mb_added"`
-	DurationSeconds  int    `json:"duration_seconds"`
-	Message          string `json:"message"`
+	Status         string `json:"status"`
+	SessionID      string `json:"session_id"`
+	Type           string `json:"type"`
+	TimeoutSeconds int    `json:"timeout_seconds"`
+	VMIP           string `json:"vm_ip"`
+	Message        string `json:"message"`
 }
-

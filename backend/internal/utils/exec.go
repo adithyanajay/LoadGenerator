@@ -5,17 +5,13 @@ import (
 	"os/exec"
 )
 
-func RunStressNG(args []string) {
-	cmd := exec.Command("stress-ng", args...)
-
+func StartProcess(cmd *exec.Cmd) {
 	if err := cmd.Start(); err != nil {
-		log.Println("Failed to start stress-ng:", err)
+		log.Println("Failed to start process:", err)
 		return
 	}
 
-	// Fire-and-forget
 	go func() {
 		_ = cmd.Wait()
 	}()
 }
-

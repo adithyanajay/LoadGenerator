@@ -8,15 +8,13 @@ import (
 )
 
 func main() {
-	router := gin.Default()
+	r := gin.Default()
+	r.Use(api.CORSMiddleware())
 
-	router.Use(api.CORSMiddleware())
-
-	api.RegisterRoutes(router)
+	api.RegisterRoutes(r)
 
 	log.Println("Load Generator running on :9000")
-	if err := router.Run(":9000"); err != nil {
+	if err := r.Run(":9000"); err != nil {
 		log.Fatal(err)
 	}
 }
-
