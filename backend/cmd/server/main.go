@@ -3,13 +3,14 @@ package main
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"load-generator/internal/api"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
-	r.Use(api.CORSMiddleware())
+	// r.Use(api.CORSMiddleware())
 
 	api.RegisterRoutes(r)
 
