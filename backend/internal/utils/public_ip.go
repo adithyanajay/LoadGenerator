@@ -4,26 +4,31 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
-// GetPublicIP tries EC2 metadata first, falls back gracefully
+// GetPublicIP returns the VM's public IPv4 as seen externally
 func GetPublicIP() (string, error) {
 	client := &http.Client{
-		Timeout: 2 * time.Second,
+		Timeout: 3 * time.Second,
 	}
 
-	resp, err := client.Get(
-		"http://169.254.169.254/latest/meta-data/public-ipv4",
-	)
-	if err == nil && resp.StatusCode == http.StatusOK {
-		defer resp.Body.Close()
-		body, _ := io.ReadAll(resp.Body)
-		if len(body) > 0 {
-			return string(body), nil
-		}
+	resp, err := client.Get("http://checkip.amazonaws.com")
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch public IP: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read IP response: %w", err)
 	}
 
-	// ❗ DO NOT FAIL — return empty string
-	return "", fmt.Errorf("no public IP available")
+	ip := strings.TrimSpace(string(body))
+	if ip == "" {
+		return "", fmt.Errorf("empty public IP response")
+	}
+
+	return ip, nil
 }
