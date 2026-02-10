@@ -10,7 +10,7 @@ import (
 
 func main() {
 	r := gin.Default()
-	// r.Use(api.CORSMiddleware())
+	r.Use(api.CORSMiddleware())
 
 	api.RegisterRoutes(r)
 
