@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"load-generator/internal/api"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 	r.Use(gin.Recovery())
 
 	// ✅ ONE place only
-	r.Use(api.CORSMiddleware())
+	// r.Use(api.CORSMiddleware())
 
 	api.RegisterRoutes(r)
 
