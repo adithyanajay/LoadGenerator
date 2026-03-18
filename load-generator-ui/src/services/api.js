@@ -1,6 +1,6 @@
 // src/services/api.js
 
-const LOAD_BALANCER_URL = "http://98.92.116.72:8080/api/v1/load"
+const LOAD_BALANCER_URL = "http://34.204.172.76:8080/api/v1/load"
 
 export async function startLoad(payload) {
   const res = await fetch(LOAD_BALANCER_URL, {
